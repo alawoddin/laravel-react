@@ -19,3 +19,6 @@ Route::controller(TestController::class)->group(function () {
 });
 
 Route::apiResource('projects', ProjectController::class);
+
+
+Route::apiResource('tasks', ProjectController::class);
