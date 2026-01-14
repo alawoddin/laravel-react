@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ProjectController;
 use App\Http\Controllers\API\TestController;
 use Illuminate\Http\Request;
@@ -18,7 +19,18 @@ Route::controller(TestController::class)->group(function () {
     Route::get('/test', 'index');
 });
 
-Route::apiResource('projects', ProjectController::class);
+Route::apiResource('projects', ProjectController::class)->middleware('auth:sanctum');
 
 
-Route::apiResource('tasks', ProjectController::class);
+Route::apiResource('tasks', ProjectController::class)->middleware('auth:sanctum');
+
+// register
+Route::post('/register' , [AuthController::class , 'register']);
+
+// login
+Route::post('/login' , [AuthController::class , 'login']);
+
+
+// logout
+
+Route::post('/logout' , [AuthController::class , 'logout'])->middleware('auth:sanctum');
