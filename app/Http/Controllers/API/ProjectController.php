@@ -21,18 +21,18 @@ class ProjectController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-   public function store(Request $request)
-{
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'info' => 'nullable|string',
-        'due_date' => 'nullable',
-    ]);
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'info' => 'nullable|string',
+            'due_date' => 'nullable',
+        ]);
 
-    $project = Project::create($validated);
+        $project = Project::create($validated);
 
-    return response()->json($project, 201);
-}
+        return response()->json($project, 201);
+    }
 
     /**
      * Display the specified resource.
@@ -42,12 +42,12 @@ class ProjectController extends Controller
         //
 
         $project = Project::find($id);
-        if(!$project){
+        if (!$project) {
             return response()->json([
                 'message' => 'project not founded'
-            ] , 404);
+            ], 404);
         }
-        return response()->json($project , 200);
+        return response()->json($project, 200);
     }
 
     /**
@@ -55,25 +55,25 @@ class ProjectController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
         $project = Project::find($id);
-        if(!$project){
+
+        if (!$project) {
             return response()->json([
-                'message' => 'project not founded'
-            ] , 404);
+                'message' => 'project not found'
+            ], 404);
         }
-        
-        $project::update([
+
+        // ✅ Fixed: Use -> instead of ::
+        $project->update([
             'name' => $request->name,
             'info' => $request->info,
             'due_date' => $request->due_date,
-            $project->save()
         ]);
 
-        return response()->json($project, 201);
+        // Optional: Refresh the model to get updated data
+        $project->refresh();
 
-        
-
+        return response()->json($project, 200); // Use 200 for successful updates
     }
 
     /**
@@ -83,15 +83,15 @@ class ProjectController extends Controller
     {
         //
         $project = Project::find($id);
-        if(!$project){
+        if (!$project) {
             return response()->json([
                 'message' => 'project not founded'
-            ] , 404);
+            ], 404);
         }
         $project->delete();
 
         return response()->json([
             'message' => 'project is delete'
-        ] , 201);
+        ], 201);
     }
 }
