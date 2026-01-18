@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('info');
             $table->enum('status' , ['pending' , 'in_progress' , 'completed'])->default('pending');
+            $table->date('due_date')->nullable();
             $table->timestamps();
 
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');

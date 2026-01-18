@@ -25,18 +25,30 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
-         $validated = $request->validate([
-        'project_id' => 'required|',
-        'title' => 'required|string|max:255',
-        'info' => 'nullable|string',
-        'status' => 'in:pending, in_progress, completed',
-        'due_date' => 'nullable',
-    ]);
+        $validated = $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'title' => 'required|string|max:255',
+            'info' => 'nullable|string',
+            'status' => 'required|in:pending,in_progress,completed',
+            'due_date' => 'nullable|date|after_or_equal:today',
+        ]);
 
-    $tasks = Task::create($validated);
+        // Only allow specific fields (more secure than $guarded = [])
+        $taskData = [
+            'project_id' => $validated['project_id'],
+            'title' => $validated['title'],
+            'info' => $validated['info'] ?? '',
+            'status' => $validated['status'],
+            'due_date' => $validated['due_date'] ?? null,
+        ];
 
-    return response()->json($tasks, 201);
+        $task = Task::create($taskData);
+        $task->load('project');
+
+        return response()->json([
+            'message' => 'Task created successfully',
+            'task' => $task
+        ], 201);
     }
 
     /**
@@ -48,10 +60,10 @@ class TaskController extends Controller
 
         $task = Task::with('project')->find($id);
 
-        if(!$task) {
+        if (!$task) {
             return response()->json([
                 'message' => 'task not founded'
-            ] , 404);
+            ], 404);
         }
 
         return response()->json($task, 200);
@@ -60,49 +72,48 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-   public function update(Request $request, string $id)
-{
-    $task = Task::find($id);
+    public function update(Request $request, string $id)
+    {
+        $task = Task::find($id);
 
-    if (!$task) {
+        if (!$task) {
+            return response()->json([
+                'message' => 'Task not found'
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'title'      => 'required|string|max:255',
+            'info'       => 'nullable|string',
+            'status'     => 'required|in:pending,in_progress,completed',
+            'due_date'   => 'nullable|date',
+        ]);
+
+        $task->update($validated);
+
         return response()->json([
-            'message' => 'Task not found'
-        ], 404);
+            'message' => 'Task updated successfully',
+            'task'    => $task
+        ], 200);
     }
-
-    $validated = $request->validate([
-        'project_id' => 'required|exists:projects,id',
-        'title'      => 'required|string|max:255',
-        'info'       => 'nullable|string',
-        'status'     => 'required|in:pending,in_progress,completed',
-        'due_date'   => 'nullable|date',
-    ]);
-
-    $task->update($validated);
-
-    return response()->json([
-        'message' => 'Task updated successfully',
-        'task'    => $task
-    ], 200);
-}
     /**
      * Remove the specified resource from storage.
      */
-   public function destroy(string $id)
-{
-    $task = Task::with('project')->find($id);
+    public function destroy(string $id)
+    {
+        $task = Task::with('project')->find($id);
 
-    if (!$task) {
+        if (!$task) {
+            return response()->json([
+                'message' => 'Task not found'
+            ], 404);
+        }
+
+        $task->delete();
+
         return response()->json([
-            'message' => 'Task not found'
-        ], 404);
+            'message' => 'Task deleted successfully'
+        ], 200);
     }
-
-    $task->delete();
-
-    return response()->json([
-        'message' => 'Task deleted successfully'
-    ], 200);
-}
-
 }

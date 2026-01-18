@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ProjectController;
+use App\Http\Controllers\API\TaskController;
 use App\Http\Controllers\API\TestController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,7 +23,7 @@ Route::controller(TestController::class)->group(function () {
 Route::apiResource('projects', ProjectController::class)->middleware('auth:sanctum');
 
 
-Route::apiResource('tasks', ProjectController::class)->middleware('auth:sanctum');
+Route::apiResource('tasks', TaskController::class)->middleware('auth:sanctum');
 
 // register
 Route::post('/register' , [AuthController::class , 'register']);
