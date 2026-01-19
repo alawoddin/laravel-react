@@ -26,7 +26,7 @@ Route::apiResource('projects', ProjectController::class)->middleware('auth:sanct
 Route::apiResource('tasks', TaskController::class)->middleware('auth:sanctum');
 
 // register
-Route::post('/register' , [AuthController::class , 'register']);
+Route::post('/register' , [AuthController::class , 'register']); 
 
 // login
 Route::post('/login' , [AuthController::class , 'login']);

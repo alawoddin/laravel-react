@@ -41,7 +41,7 @@ class ProjectController extends Controller
     {
         //
 
-        $project = Project::find($id);
+        $project = Project::with('tasks')->find($id);
         if (!$project) {
             return response()->json([
                 'message' => 'project not founded'
